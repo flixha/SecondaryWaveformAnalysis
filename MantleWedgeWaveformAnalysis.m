@@ -67,8 +67,8 @@ seisanREAdir{1} = fullfile(SEISAN_TOP, 'REA', 'ANTIP');
 
 %simulTOP = '/Volumes/nasdata/Greece_MWcluster/Relocation3D/';
 %simulrRELOCdir{1} = fullfile(simulTOP, 'MEDUT_Reloc');
-%seisanWAVdir = fullfile('MWS/Seisan-linux/WAV/ANTIP');
-seisanWAVdir = fullfile('converted_mseed_test/corrected_waveforms');
+seisanWAVdir = fullfile('MWS/Seisan-linux/WAV/ANTIP');
+% seisanWAVdir = fullfile('converted_mseed_test/corrected_waveforms');
 
 detTimeWindow=seconds(4);
 
