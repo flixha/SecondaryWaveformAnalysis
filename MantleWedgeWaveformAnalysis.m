@@ -46,13 +46,13 @@ requestStations = {'FDF','ANWB'}';
 
 
 % List of stations for correlation analysis
-cstation = {'FDF','ANWB'}';
-%cstation = {'OS1','OS2','OS3','OS4','OS5B'}'; %200706
+% cstation = {'FDF','ANWB'}';
+cstation = {'OS1','OS2','OS3','OS4','OS5B'}'; %200706
 %cstation = {'F00A','F01A','F02A','F03A','F04A'}'; %200701
     
 
-corcomp = {'Z','E','N'};  % Components to be correlated
-%corcomp = {'Z','1','2'};
+% corcomp = {'Z','E','N'};  % Components to be correlated
+corcomp = {'Z','one','two'};
 minFrequency = 1.5;
 maxFrequency = 10;
 tic
@@ -72,8 +72,8 @@ seisanWAVdir = fullfile('MWS/Seisan-linux/WAV/ANTIP');
 
 detTimeWindow=seconds(4);
 
-startTime = '2007/01/01 00:00:00'; 
-endTime = '2007/01/20 00:00:00';
+startTime = '2007/06/01 00:00:00'; 
+endTime = '2007/07/01 00:00:00';
 
 if loadFromPreviousState && ~loadCorrelationsFromPreviousState
     load(catalogFile, 'events');
@@ -115,7 +115,7 @@ eventI = [I_MWCluster]';
 eventI = sort(eventI);
 
 % all:
-% eventI=[1:1:events.numberOfEvents];
+eventI=[1:1:events.numberOfEvents];
 
 nSelectedEvents = length(eventI);
 
@@ -129,12 +129,12 @@ if loadCorrelationsFromPreviousState
 else
     % CHeck whether events still contains waveforms - if there are
     % none, reload the whole database from .mat-file
-    if all(cellfun(@isempty,events.waveforms))
+    if all(cellfun(@isempty, events.waveforms))
         clear events;
         load(catalogFile, 'events');
     end
-    c = buildCorrelationCatalog(events, eventI, cstation, corcomp,...
-        targetSamplingRateForProcessing);
+    c = buildCorrelationCatalog(events, eventI, cstation, corcomp, ...
+                                targetSamplingRateForProcessing);
     if saveState
         %save(['events_CorrelationObject_', num2str(length(eventI)),...
         %    '_', datestr(datetime('today'),'yyyy-mm-dd'), '.mat'],...
@@ -302,7 +302,9 @@ end
 %% now process the waveforms per station and channel
 
 tic
-comp = {'Z','N','E'};
+% comp = {'Z','N','E'};
+% comp = {'Z','one','two'};
+comp = corcomp;
 
 if loadCorrelationsFromPreviousState
     load(corObjFileProcessed, 'c2');
@@ -322,7 +324,8 @@ toc
 
 if doProcessStationGathers
     minimumSNR = 2.5;
-    comp = {'Z','N','E'};
+    % comp = {'Z','N','E'};
+    comp = corcomp;
     c3 = requestMinimumSNR(c2, 2.5);
     %c3 = resampleNetworkCorrObject(c3, targetSamplingRateAfterFilter);
     % adjust the trigger times of all traces
@@ -330,7 +333,6 @@ if doProcessStationGathers
     % load('c3_CorrelationObject_PolarizationFiltered_aligned483_2018-08-02.mat');
 
     c2station = cstation;
-    % c2station = {'S011'};
     tic
     % polarizationfilter...: (zrt, 1, 1, 2, 0.02, 0.6) n, J, K, dt, width:
     % these values seem reasonable
