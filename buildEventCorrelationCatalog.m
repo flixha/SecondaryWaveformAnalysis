@@ -61,7 +61,7 @@ function [eventCorrelationCatalog] = buildEventCorrelationCatalog(seisCatalog,..
             %for each station
             for k=1:1:length(cstation)
                 staCompWavI = find(strcmp(wstation,cstation{k}) &...
-                    strcmp(wcomponent,corcomp{ncc}));
+                                   strcmp(wcomponent, getCorCompValue(corcomp{ncc})));
                 
                 if ~isempty(staCompWavI)
                     clear prevWav prevTrig ptriggers;
@@ -114,8 +114,8 @@ function [eventCorrelationCatalog] = buildEventCorrelationCatalog(seisCatalog,..
                                 %setWav = extract(setWav, 'TIME',...
                                 %    seisCatalog.otime(j),...
                                 %    seisCatalog.otime(j)+90/SECPERDAY);
-                                eventC.(corcomp{ncc}){m,1} = set(eventC.(...
-                                    corcomp{ncc}){m,1},'waveform',setWav);
+                                eventC.(corcomp{ncc}){m,1} = set( ...
+                                    eventC.(corcomp{ncc}){m,1},'waveform',setWav);
 
 
                                 % set the trigger to either the pick or an
