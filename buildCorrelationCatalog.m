@@ -48,6 +48,7 @@ function [correlationCatalog] = buildCorrelationCatalog(seisCatalog,...
         if size(wchannel,1) == size(wchannel,2) && size(wchannel,1) > 1
             wchannel = wchannel(:,1);
         end
+        wstation = string(wstation');
         wchannel = char(wchannel);
         wcomponent = cellstr(wchannel(:,end));
         %for each station
@@ -157,7 +158,7 @@ function [correlationCatalog] = buildCorrelationCatalog(seisCatalog,...
                         testWav = waveform();
                         ct = get(seisCatalog.waveforms{j}(staWavI(1)),'ChannelTag');
                         ct = ct(1);
-                        ct.channel = [ct.channel(1:end-1), corcomp{ncc}];
+                        ct.channel = [ct.channel(1:end-1), getCorCompValue(corcomp{ncc})];
                         testWav = set(testWav,'ChannelTag', ct);
                         testWav = set(testWav,'data', NaN(120*targetSamplingRate,1));
                         testWav = set(testWav,'freq',targetSamplingRate);
