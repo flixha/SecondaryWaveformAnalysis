@@ -25,6 +25,11 @@ function [correlationCatalog] = buildCorrelationCatalog(seisCatalog,...
         eventI = eventI';
     end
     
+    if size(eventI, 1) == 0 || size(eventI, 2) == 0
+        warning("No events left in catalog after selection")
+        return
+    end
+
     %for each event
     for j = eventI
         w = seisCatalog.waveforms{j};
