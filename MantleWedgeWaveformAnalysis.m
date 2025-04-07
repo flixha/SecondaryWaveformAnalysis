@@ -30,11 +30,11 @@ fm3Dpath = ['/Volumes/nasdata2/Documents2/Greece_MWcluster/',...
     'FastMarching/Runs/EventRuns_0.02deg_DepthCorrectlyInverted/'];
 
 % earthquake catalog file once saved from Matlab:
-catalogFile = 'greekevents_629_2018-10-24.mat';
+catalogFile = 'events_2025-04-07.mat';
 catalogFile_withoutWav = 'greekevents_629_withoutWaveforms_2018-10-24.mat';
 
-corEventObjFile = 'InterfaceEvents_EventCorrelationObject_232_2018-10-24.mat';
-corEventObjFileForSTF = 'InterfaceEvents_EventCorrelationObjectForSTFs_232_2018-10-24.mat';
+corEventObjFile = 'events_CorrelationObject_7_2025-04-07.mat';
+entObjFileForSTF = 'InterfaceEvents_EventCorrelationObjectForSTFs_232_2018-10-24.mat';
 
 corObjFile = 'events_CorrelationObject_468_2018-11-07.mat';
 corObjFileProcessed = 'events_CorrelationObject_PreProcessed468_2018-11-21.mat';
@@ -68,14 +68,12 @@ seisanREAdir{1} = fullfile(SEISAN_TOP, 'REA', 'ANTIP');
 %simulTOP = '/Volumes/nasdata/Greece_MWcluster/Relocation3D/';
 %simulrRELOCdir{1} = fullfile(simulTOP, 'MEDUT_Reloc');
 seisanWAVdir = fullfile('MWS/Seisan-linux/WAV/ANTIP');
-% seisanWAVdir = fullfile('converted_mseed_test/corrected_waveforms');
+%seisanWAVdir = fullfile('converted_mseed_test/corrected_waveforms');
 
 detTimeWindow=seconds(4);
 
-startTime = '2007/01/09 00:00:00'; 
-endTime = '2007/01/30 59:59:59';
-% endTime = '2007/01/31 00:00:00';
-% endTime = '2007/12/31 00:00:00';
+startTime = '2007/01/01 00:00:00'; 
+endTime = '2007/01/20 00:00:00';
 
 if loadFromPreviousState && ~loadCorrelationsFromPreviousState
     load(catalogFile, 'events');
@@ -106,52 +104,14 @@ end
 
 %% select earthquakes in specific regions / clusters
 
-% !!southern Tripoli cluster!!
-% minY = -35;
-% maxY = 10;
-% as wide as possible, but still rather vertical incoming rays
-% maxY = 50;
-% minY = -50;
-maxY = 25;
-minY = -35;
-minZ = 20;
-maxZ = 200;
-
+% !!Test Lesser Antilles!!
 %get earthquakes within a region around the GRT cross section image
 %interface fault cluster
-I_IFCluster = find(events.table.y > -15 & events.table.y < -4.9 &...
-                   events.table.x > 83.5 & events.table.x < 93.5 &...
-                   events.table.depth > 54 & events.table.depth < 60 );
-%within-MW-cluster
-I_MWCluster = find(events.table.y > -20 & events.table.y < 0 &...
-                   events.table.x > 69 & events.table.x < 83 &...
-                   events.table.depth < 56);
-%intraslabclsuter
-I_ISCluster = find(events.table.y > -10 & events.table.y < 0 &...
-                   events.table.x > 65 & events.table.x < 113 );
-I_ISCluster = I_ISCluster(~ismember(I_ISCluster,I_IFCluster) &...
-                          ~ismember(I_ISCluster,I_MWCluster));
+I_MWCluster = find(events.table.lon > -62 & events.table.lon < -60 &...
+                   events.table.lat > 14 & events.table.lat < 15.5 &...
+                   events.table.depth > 35 & events.table.depth < 60 );
 
-eventI = [I_MWCluster; I_IFCluster; I_ISCluster]';
-
-%other events below the array
-I_ArrayCluster = find(...
-    events.table.x > 65 & events.table.x < 125 &...
-    events.table.y > minY & events.table.y < maxY &...
-    events.table.z > minZ & events.table.z < maxZ);
-I_ArrayCluster = I_ArrayCluster(~ismember(I_ArrayCluster,eventI));
-
-
-
-%Interface Fault Cluster
-% eventI = I_MWCluster';
-% eventI = I_IFCluster';
-% eventI = I_ISCluster';
-
-% eventI = [I_MWCluster; I_IFCluster; I_ISCluster]';
-eventI = [I_MWCluster; I_IFCluster; I_ISCluster; I_ArrayCluster]';
-% eventI = I_IFCluster;
-
+eventI = [I_MWCluster]';
 eventI = sort(eventI);
 
 % all:
@@ -257,7 +217,7 @@ else
                 'yyyy-mm-dd'), '.mat'], 'eventCforSTF');
         end
         save(['events_', num2str(length(...
-            events.cat.numberOfEvents)), '_withoutWaveforms_',...
+            events.numberOfEvents)), '_withoutWaveforms_',...
             datestr(datetime('today'),'yyyy-mm-dd'), '.mat'],...
             'events');
     end
