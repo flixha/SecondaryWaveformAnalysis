@@ -35,17 +35,17 @@ fm3Dpath = ['/Volumes/nasdata2/Documents2/Greece_MWcluster/',...
 
 % earthquake catalog file once saved from Matlab:
 catalogFile = 'events_2025-04-08_allCatOBS.mat';
-catalogFile_withoutWav = 'greekevents_629_withoutWaveforms_2018-10-24.mat';
+catalogFile_withoutWav = 'events_2025-04-08_allCatOBS.mat';
 
 corEventObjFile = 'events_CorrelationObject_7_2025-04-07.mat';
-entObjFileForSTF = 'InterfaceEvents_EventCorrelationObjectForSTFs_232_2018-10-24.mat';
+% entObjFileForSTF = 'InterfaceEvents_EventCorrelationObjectForSTFs_232_2018-10-24.mat';
 
-corObjFile = 'events_CorrelationObject_468_2018-11-07.mat';
-corObjFileProcessed = 'events_CorrelationObject_PreProcessed468_2018-11-21.mat';
+corObjFile = 'events_CorrelationObject_722_2025-04-08.mat';
+% corObjFileProcessed = 'events_CorrelationObject_PreProcessed468_2018-11-21.mat';
 
 % Stations to read in from Seisan files:
-requestStations = {'FDF','ANWB'}';
-%requestStations = {'OS1', 'OS2', 'OS3', 'OS4','OS5B'}'; %200706
+% requestStations = {'FDF','ANWB'}';
+requestStations = {'OS1', 'OS2', 'OS3', 'OS4','OS5B'}'; %200706
 %requestStations = {'F00A','F01A','F02A','F03A','F04A'}'; %200701
 
 
@@ -153,8 +153,6 @@ toc
 % Show 3D model:
 % [model3DFig] = plotEarthquakeCatalog3D(events,eventI);
 
-% Make another figure on top of GRT images:
-% plotGRTfigureWithEarthquakes(events,65,125,minY,maxY,false,true)
 
 %% Event-based correlation objects
 eventStations = {'FDF','ANWB'}';
@@ -352,14 +350,22 @@ if doProcessStationGathers
     dt = 1/targetSamplingRateForProcessing;
     width = 0.5;
     % Skip three-component processing for OBS data for now:
-    % c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, dt, width,...
-    %    true, false, false);
-    c4 = c3;
+    if isfield(c, 'N')
+        c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, dt, width,...
+           true, false, false);
+    else
+        c4 = c3;
+    end
     c4 = removeEmptyTraces(c4);
     toc
 
     % Automatic gain control on 3-component sets of traces
-    c5 = componentAgc(c4, {'Zp','Rp','Tp'}, 2); % or 1.5 s length?
+    if isfield(c, 'Zp')
+        c5 = componentAgc(c4, {'Zp','Rp','Tp'}, 2); % or 1.5 s length?
+    else
+        c5 = componentAgc(c4, corcomp, 2); % or 1.5 s length?
+    end
+    
     % Automatic gain control on individual traces:
     % c5 = agcEachTrace(c4, 1);
 
@@ -408,24 +414,35 @@ end
 %                 plotArrivals, plotEnvelope, labelArrivals,...
 %                 fileNameAddition0);
 
-%% 
+%% Create three-component figures
 baseScale = 1.2;
 [plotArrivals, labelArrivals, plotComp, fileNameAddition0,plotEnv,...
     plotType, linewidth, scale, doPlotHistograms] =...
         getThreeCompPlotOptions(1,'proc_raw_', false, baseScale);
 plotComp = {'Z', 'N', 'E'};
+plotComp = corcomp;
 clear axes
+
+c_out = c2;
+
 for nc=1:1:numel(plotComp)
-    plotWavesAtStationSortedBy(c, plotComp{nc}, 'S010', 'DFST',...
-        'wig', 'scale', scale, 'linewidth', linewidth, 'markarrivaltimes',...
-        plotArrivals, 'arrivals', arrivals, 'maxconversions', 1, 'maxreflections',...
-        1, 'maxPhaseLength', 5, 'avoidPtoS', false, 'labelarrivals',labelArrivals,...
-        'plotEnvelope', plotEnv)
+    if exist("arrivals", "var")
+        plotWavesAtStationSortedBy(c_out, plotComp{nc}, 'OS1', 'DFST',...
+            'wig', 'scale', scale, 'linewidth', linewidth, 'markarrivaltimes',...
+            plotArrivals, 'arrivals', arrivals, 'maxconversions', 1, 'maxreflections',...
+            1, 'maxPhaseLength', 5, 'avoidPtoS', false, 'labelarrivals',labelArrivals,...
+            'plotEnvelope', plotEnv)
+    else
+        plotWavesAtStationSortedBy(c_out, plotComp{nc}, 'OS1', 'DFST',...
+            'wig', 'scale', scale, 'linewidth', linewidth, 'markarrivaltimes', false, ...
+            'plotEnvelope', plotEnv)
+    end
+    pause(1);
     axes(nc) = gca;
-    axes(nc).YLim = [345 360];
+    % axes(nc).YLim = [345 360];
     axes(nc).XLim = [-2 16];
 end
-newax = formatThreeComponentWaveformFigures(axes, 'S010', plotComp,...
+newax = formatThreeComponentWaveformFigures(axes, 'OS1', plotComp,...
         plotType, false, false, false, fileNameAddition0);
 
 
@@ -458,10 +475,10 @@ newax = formatThreeComponentWaveformFigures(axes, 'S010', plotComp,...
 %% make nice printable plots for correlation objects
 
 % plotComp = {'Zp'};
+plotComp = corcomp;
 
-% conversionStations = {'S009','S010','S011','PE05','PE07','S012',...
-%     'PE02','S013','S014','S015','S016'};
-conversionStations = requestStations
+conversionStations = {'OS1', 'OS2', 'OS3', 'OS4'}'; %200706
+conversionStations = requestStations;
 plotConversionStations = true;
 printFigure = true;
 plotEnvelope = true;
@@ -476,9 +493,9 @@ if plotEnvelope
         cOut = resampleNetworkCorrObject(c5, targetSamplingRateAfterFilter);
     end
 end
-
+t 
 if plotConversionStations
-    for p=[3,4,5] %1:1:4 1,2:5 1,3,4,5
+    for p= 1 : 1 : 3 % [3,4,5] %1:1:4 1,2:5 1,3,4,5
         % Plot the three-component figures 3 times: 
         % 1. with raw ZRT channels,
         % 2. plotted against proper y-axis
@@ -490,10 +507,14 @@ if plotConversionStations
             getThreeCompPlotOptions(p,fileNameAddition0, plotEnvelope, baseScale);
         if plotEnv
             scale = baseScale * 1.65;
-            
-            %cOut = SimplifyWaveformsOfNetworkCorrObject(cOut, 2);
+            % cOut = SimplifyWaveformsOfNetworkCorrObject(cOut, 2);
         else
             scale = baseScale;
+        end
+
+        % Work-around to plot channels Z / 1 / 2 for OBS right now:
+        if ~isfield(c, plotComp{end})
+            plotComp = corcomp;
         end
 
         for j=1:1:length(conversionStations)
@@ -523,15 +544,22 @@ if plotConversionStations
             for k=1:1:numel(plotComp)
                 %plot(c2.(plotComp).(conversionStations{j}).corr,'wig',1.5)
                 %try
-                plotWavesAtStationSortedBy(cOut, plotComp{k},...
-                    conversionStations{j}, 'DFST', plotType,...
-                    'scale', scale, 'linewidth', linewidth,...
-                    'markarrivaltimes', plotArrivals, 'arrivals',...
-                    arrivals,'maxconversions',1,'maxreflections', 1,...
-                    'maxConvAndRefl', 2, 'maxPhaseLength', 5,...
-                    'labelarrivals',labelArrivals, 'plotEnvelope',...
-                    plotEnv, 'avoidPtoS', false, 'plotPMS',true,...
-                    'colorful',true)
+                if exist('arrivals', 'var')
+                    plotWavesAtStationSortedBy(cOut, plotComp{k},...
+                        conversionStations{j}, 'DFST', plotType,...
+                        'scale', scale, 'linewidth', linewidth,...
+                        'markarrivaltimes', plotArrivals, 'arrivals',...
+                        arrivals,'maxconversions',1,'maxreflections', 1,...
+                        'maxConvAndRefl', 2, 'maxPhaseLength', 5,...
+                        'labelarrivals',labelArrivals, 'plotEnvelope',...
+                        plotEnv, 'avoidPtoS', false, 'plotPMS',true,...
+                        'colorful',true)
+                else
+                    plotWavesAtStationSortedBy(cOut, plotComp{k},...
+                        conversionStations{j}, 'DFST', plotType,...
+                        'scale', scale, 'linewidth', linewidth,...
+                        'markarrivaltimes', false, 'plotEnvelope', plotEnv)
+                end
                     %'SV_vs_P',SonRp_vs_PonZp, 'SH_vs_P', SonTp_vs_PonZp,...
                 %catch
                 %    continue
