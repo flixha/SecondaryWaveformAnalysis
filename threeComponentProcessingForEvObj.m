@@ -98,7 +98,8 @@ for j=1:1:eventC.cat.numberOfEvents
     zrttc = threecomp([Z(1),N(1),E(1)],0,0,[0 0 0 90 90 90]);
     zrttc = repmat(zrttc,numel(Z),1);
     %for each event
-    parfor k=1:1:nw
+    % parfor k=1:1:nw
+    for k=1:1:nw
         % Check if any channel is NaN or all zero, then don't rotate
         if any(isnan(get(Z(k),'data'))) || any(isnan(get(N(k),'data'))) ||...
                 any(isnan(get(E(k),'data'))) ||...
