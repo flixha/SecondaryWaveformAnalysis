@@ -357,7 +357,6 @@ if doProcessStationGathers
     %c5 = agcEachTrace(c4, 1);
 
     % plotWavesAtStationSortedBy(c3,'Zg','S011','distfromslabtop','wig')
-    % plotGRTfigureWithEarthquakes(subset(events,eventI),-100,100,true)
     if saveState
         save(['events_CorrelationObject_3compProcessed', num2str(...
             length(eventI)), '_', datestr(datetime('today'),...
@@ -453,15 +452,9 @@ newax = formatThreeComponentWaveformFigures(axes, 'S010', plotComp,...
 
 % plotComp = {'Zp'};
 
-conversionStations = {'S009','S010','S011','PE05','PE07','S012',...
-    'PE02','S013','S014','S015','S016'};
 % conversionStations = {'S009','S010','S011','PE05','PE07','S012',...
-%     'PE02','S013','S014','S015','S016','S019','S020','S022'};
-% conversionStations = {'S015'}; 
-% conversionStations = {'S009','S010','S011','S014','S015','PE02','PE07'}; 
-% conversionStations = {'S009','S010','S011','PE05','PE07','S012',...
-%     'PE02','S013','S014','S015','S016','S018','S019','S020','S022',...
-%     'S027','S040'};
+%     'PE02','S013','S014','S015','S016'};
+conversionStations = requestStations
 plotConversionStations = true;
 printFigure = true;
 plotEnvelope = true;
