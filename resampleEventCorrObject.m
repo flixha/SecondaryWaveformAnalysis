@@ -27,7 +27,9 @@ function eventCOut = resampleEventCorrObject(eventC, targetSamplingRate)
                 ResampleD = resample(D,P,Q);
             end
 
-            parfor w=1:1:numel(wavs)
+            % To run this in parallel:
+            for w=1:1:numel(wavs)
+            % parfor w=1:1:numel(wavs)
                 wav = wavs(w);
                 % put back into waveform, but don't forget to 
                 % update the frequency               

@@ -17,7 +17,8 @@ function cOut = SimplifyWaveformsOfNetworkCorrObject(c, reductionFactor)
             end          
             wavs = get(c.(comp{k}).(cstation{s}).corr, 'waveform');
             
-            parfor w=1:1:numel(wavs)
+            % parfor w=1:1:numel(wavs)
+            for w=1:1:numel(wavs)
                 wav = wavs(w);
                 
                 data = get(wav,'data');
