@@ -24,7 +24,7 @@ function [correlationCatalog] = buildCorrelationCatalog(seisCatalog,...
     if size(eventI,1) > size(eventI,2)
         eventI = eventI';
     end
-    
+
     if size(eventI, 1) == 0 || size(eventI, 2) == 0
         warning("No events left in catalog after selection")
         return
@@ -39,6 +39,7 @@ function [correlationCatalog] = buildCorrelationCatalog(seisCatalog,...
         end
         wstation = get(w,'station');
         wchannel = get(w,'channel');
+
         % I don't understand why this happens, but sometimes the above two
         % get statements return a X*X cell of station names for a
         % waveform object with only X waveforms
