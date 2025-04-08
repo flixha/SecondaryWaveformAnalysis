@@ -327,7 +327,8 @@ if doProcessStationGathers
     % comp = {'Z','N','E'};
     comp = corcomp;
     c3 = requestMinimumSNR(c2, 2.5);
-    %c3 = resampleNetworkCorrObject(c3, targetSamplingRateAfterFilter);
+    % Resample all waveforms to same sampling rate if this was not done before:
+    % c3 = resampleNetworkCorrObject(c3, targetSamplingRateAfterFilter);
     % adjust the trigger times of all traces
 
     % load('c3_CorrelationObject_PolarizationFiltered_aligned483_2018-08-02.mat');
@@ -339,22 +340,24 @@ if doProcessStationGathers
     % c4 = threeComponentProcessing(c3, c2station, 1, 1, 2, 0.02, 0.6, true, false);
     % n =0.5 or 1 changes very little
     % for rather low frequency filters, 1.5 -6 Hz:
-    %c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, 0.01, 1.0, true, false);
+    % c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, 0.01, 1.0, true, false);
     % the width is crucial! chose e.g. 0.5 s width for 1.5 - 10 Hz filter
     % let's try 0.35 s window length for 1.5 - 15 Hz filter
     windowLength = 10/maxFrequency * 0.5;
     
     dt = 1/targetSamplingRateForProcessing;
     width = 0.5;
-    c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, dt, width,...
-        true, false, false);
+    % Skip three-component processing for OBS data for now:
+    % c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, dt, width,...
+    %    true, false, false);
+    c4 = c3;
     c4 = removeEmptyTraces(c4);
-    % c4 = threeComponentProcessing(c3, c2station, 0.5, 1, 2, 0.01,...
-    %     windowLength, true, false);
     toc
-    
+
+    % Automatic gain control on 3-component sets of traces
     c5 = componentAgc(c4, {'Zp','Rp','Tp'}, 2); % or 1.5 s length?
-    %c5 = agcEachTrace(c4, 1);
+    % Automatic gain control on individual traces:
+    % c5 = agcEachTrace(c4, 1);
 
     % plotWavesAtStationSortedBy(c3,'Zg','S011','distfromslabtop','wig')
     if saveState
