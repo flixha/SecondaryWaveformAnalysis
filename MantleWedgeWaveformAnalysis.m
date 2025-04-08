@@ -447,8 +447,9 @@ newax = formatThreeComponentWaveformFigures(axes, 'OS1', plotComp,...
 
 
 %% plot waveforms with 
-% plotWavesAtStationSortedBy(c4,'Z','S011','method','Z','plottype','wig',...
-%    'markArrivalTimes',true)
+ plotWavesAtStationSortedBy(c4,'Z','OS1','method','distanceFromSlabTop','plottype','wig')
+
+ plotWavesAtStationSortedBy(c4,'Z','OS1','method','distanceFromSlabTop','plottype','bwig', plotEnvelope=true)
 
 %% Plot waveforms at a station sorted by some parameter of the event (depth, lat, x-)
 % Stations S011 and S012 and S013 ( this has maybe lowest SNR, and weaker 
@@ -478,7 +479,7 @@ newax = formatThreeComponentWaveformFigures(axes, 'OS1', plotComp,...
 plotComp = corcomp;
 
 conversionStations = {'OS1', 'OS2', 'OS3', 'OS4'}'; %200706
-conversionStations = requestStations;
+% conversionStations = requestStations;
 plotConversionStations = true;
 printFigure = true;
 plotEnvelope = true;
@@ -493,7 +494,7 @@ if plotEnvelope
         cOut = resampleNetworkCorrObject(c5, targetSamplingRateAfterFilter);
     end
 end
-t 
+
 if plotConversionStations
     for p= 1 : 1 : 3 % [3,4,5] %1:1:4 1,2:5 1,3,4,5
         % Plot the three-component figures 3 times: 
