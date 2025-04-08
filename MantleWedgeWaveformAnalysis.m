@@ -8,9 +8,13 @@ user_name = char(java.lang.System.getProperty('user.name'));
 %if strcmp(user_name, "felix")  % Felix, Mac
 %    pyenv(Version="/Volumes/MacHD1/Users/felix/Software/miniconda/miniconda3/envs/GMTpy312/bin/python")
 %end
+if strcmp(user_name, "oceanefoix")
+    pyenv('Version', '/Users/oceanefoix/.venv/bin/python')
+end
+
 
 % set parameters
-loadFromPreviousState = false;              % activate for quick-loading after saving state
+loadFromPreviousState = true;               % activate for quick-loading after saving state
 saveState = true;                           % whether to save state at some points in the code
 loadCorrelationsFromPreviousState = false;  % whether to quick-load correlation objects
 reloadFM3Darrivals = false;                 % whether to reload fm3d arrivals from FM3D output text
@@ -30,7 +34,7 @@ fm3Dpath = ['/Volumes/nasdata2/Documents2/Greece_MWcluster/',...
     'FastMarching/Runs/EventRuns_0.02deg_DepthCorrectlyInverted/'];
 
 % earthquake catalog file once saved from Matlab:
-catalogFile = 'events_2025-04-07.mat';
+catalogFile = 'events_2025-04-08_allCatOBS.mat';
 catalogFile_withoutWav = 'greekevents_629_withoutWaveforms_2018-10-24.mat';
 
 corEventObjFile = 'events_CorrelationObject_7_2025-04-07.mat';
