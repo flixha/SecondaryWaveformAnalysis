@@ -356,6 +356,7 @@ if doProcessStationGathers
     else
         c4 = c3;
     end
+    % Remove traces where any of the three components is invalid (nan, empty)
     c4 = removeEmptyTraces(c4);
     toc
 
